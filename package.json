@@ -1,18 +1,16 @@
 {
-  "name": "math-genius-app",
+  "name": "math-genius-deepseek-app",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "deploy": "vercel --prod"
   },
   "dependencies": {
-    "@google/generative-ai": "^0.24.1",
-    "@types/dompurify": "^3.0.5",
-    "@types/plotly.js": "^3.0.8",
     "axios": "^1.13.2",
     "clsx": "^2.1.1",
     "dompurify": "^3.3.0",
@@ -27,8 +25,9 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
-    "@types/node": "^24.10.1",
-    "@types/react": "^19.2.5",
+    "@types/axios": "^0.14.4",
+    "@types/node": "^24.10.3",
+    "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
     "@types/react-plotly.js": "^2.6.3",
     "@vitejs/plugin-react": "^5.1.1",
