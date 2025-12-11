@@ -5,7 +5,7 @@ import { auth } from '../firebase'; // Import auth
 import { useSubscription } from './SubscriptionGuard'; // Import Hook lấy ngày
 // --------------------------------------THÊM LÝ THUYẾT
 import { Sparkles, KeyRound, LogOut, Clock, BookOpen, X } from 'lucide-react'; // Thêm BookOpen, X
-import { generateTheory } from '../geminiService'; // Import hàm mới
+import { generateTheoryWithDeepSeek } from '../deepseekService'; // ĐỔI TÊN: thay generateTheory bằng generateTheoryWithDeepSeek
 import { LatexText } from './LatexText'; // Để hiển thị công thức toán
 
 // ----------------------------------
@@ -32,9 +32,9 @@ export const QuizInput: React.FC<Props> = ({ onGenerate, isLoading }) => {
   // Lấy thông tin ngày còn lại từ SubscriptionGuard (MỚI THÊM)
   const { daysLeft, isPremium } = useSubscription();
 
-  // Load Key từ LocalStorage khi mở app
+  // Load Key từ LocalStorage khi mở app - ĐỔI TÊN KEY
   useEffect(() => {
-    const saved = localStorage.getItem('user_gemini_key');
+    const saved = localStorage.getItem('user_deepseek_key'); // ĐỔI: user_gemini_key -> user_deepseek_key
     if (saved) setApiKey(saved);
   }, []);
 
@@ -72,7 +72,7 @@ export const QuizInput: React.FC<Props> = ({ onGenerate, isLoading }) => {
 
     setLoadingTheory(true);
     try {
-        const content = await generateTheory(topic, apiKey);
+        const content = await generateTheoryWithDeepSeek(topic, apiKey); // ĐỔI: generateTheory -> generateTheoryWithDeepSeek
         setTheoryContent(content);
     } catch (e) {
         alert("Lỗi tải lý thuyết");
@@ -89,8 +89,8 @@ export const QuizInput: React.FC<Props> = ({ onGenerate, isLoading }) => {
     if (totalQuestions === 0) return alert("Vui lòng nhập số lượng câu hỏi ít nhất là 1!");
     
     // Lưu Key nếu người dùng chọn
-    if (saveKey) localStorage.setItem('user_gemini_key', apiKey);
-    else localStorage.removeItem('user_gemini_key');
+    if (saveKey) localStorage.setItem('user_deepseek_key', apiKey); // ĐỔI: user_gemini_key -> user_deepseek_key
+    else localStorage.removeItem('user_deepseek_key'); // ĐỔI: user_gemini_key -> user_deepseek_key
 
     // Gửi Key kèm config
     onGenerate({ topic, distribution: matrix, additionalPrompt: prompt }, apiKey);
@@ -127,10 +127,12 @@ export const QuizInput: React.FC<Props> = ({ onGenerate, isLoading }) => {
       {/* --- KHU VỰC NHẬP API KEY --- */}
       <div className="mb-6 bg-yellow-50 p-4 rounded-lg border border-yellow-200">
         <div className="flex justify-between items-center mb-2">
-        <label className="text-sm font-bold text-yellow-800 flex items-center gap-2">
-                <KeyRound size={18}/> Gemini API Key
+          {/* ĐỔI LABEL: Gemini API Key -> DeepSeek API Key */}
+          <label className="text-sm font-bold text-yellow-800 flex items-center gap-2">
+                <KeyRound size={18}/> DeepSeek API Key
             </label>
-            <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noreferrer" className="text-xs text-blue-600 hover:underline">
+            {/* ĐỔI LINK: https://aistudio.google.com/app/apikey -> https://platform.deepseek.com/api_keys */}
+            <a href="https://platform.deepseek.com/api_keys" target="_blank" rel="noreferrer" className="text-xs text-blue-600 hover:underline">
                 Dán Key tại đây
             </a>
         </div>
@@ -138,7 +140,7 @@ export const QuizInput: React.FC<Props> = ({ onGenerate, isLoading }) => {
           type="password"
           value={apiKey}
           onChange={(e) => setApiKey(e.target.value)}
-          placeholder="Dán mã Key bắt đầu bằng AIza..." 
+          placeholder="Dán mã Key bắt đầu bằng sk-..."  // ĐỔI: "AIza..." -> "sk-..."
           className="w-full p-3 border border-yellow-300 rounded-lg focus:ring-2 focus:ring-yellow-500 outline-none bg-white"
         />
         <div className="mt-2 flex items-center gap-2">
@@ -249,52 +251,49 @@ export const QuizInput: React.FC<Props> = ({ onGenerate, isLoading }) => {
         )}
       </div>
 
-      {/* --- CẬP NHẬT: MODAL DẠNG SIDEBAR (VỪA XEM VỪA LÀM) --- */}
-      {showTheoryModal && (
-              // Thay đổi:
-              // 1. Bỏ "inset-0 bg-black/50" (để không chắn màn hình)
-              // 2. Thêm "fixed top-24 right-5" (để neo vào góc phải)
-              // 3. Thêm shadow đậm để nổi bật trên nền trắng
-              <div className="fixed top-24 right-5 w-[450px] max-w-[90vw] h-[80vh] bg-white rounded-2xl shadow-[0_0_50px_rgba(0,0,0,0.15)] border border-gray-200 z-50 flex flex-col animate-in slide-in-from-right duration-300">
-                  
-                  {/* Header Sidebar */}
-                  {/* Thêm cursor-move nếu bạn muốn phát triển chức năng kéo thả sau này */}
-                  <div className="p-4 border-b flex justify-between items-center bg-orange-50 rounded-t-2xl">
-                      <h3 className="text-lg font-bold text-orange-800 flex items-center gap-2">
-                          <BookOpen size={20}/> LÝ THUYẾT GHI NHỚ
-                      </h3>
-                      <button 
-                          onClick={() => setShowTheoryModal(false)} 
-                          className="w-8 h-8 flex items-center justify-center rounded-full bg-white text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all shadow-sm border border-gray-100"
-                          title="Đóng lý thuyết"
-                      >
-                          <X size={18} />
-                      </button>
-                  </div>
+    {/* --- MODAL LÝ THUYẾT --- */}
+    {showTheoryModal && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
+            <div className="bg-white w-full max-w-3xl max-h-[80vh] rounded-2xl shadow-2xl flex flex-col relative">
 
-                  {/* Content Sidebar */}
-                  <div className="p-5 overflow-y-auto flex-1 text-gray-800 leading-relaxed text-sm scroll-smooth">
-                      {loadingTheory ? (
-                          <div className="flex flex-col items-center justify-center h-full space-y-3">
-                              <div className="w-8 h-8 border-4 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
-                              <p className="text-gray-500 text-xs animate-pulse">Đang tra cứu kiến thức...</p>
-                          </div>
-                      ) : (
-                          <div className="whitespace-pre-wrap">
-                              <LatexText text={theoryContent} />
-                          </div>
-                      )}
-                  </div>
+                {/* Header Modal */}
+                <div className="p-4 border-b flex justify-between items-center bg-orange-50 rounded-t-2xl">
+                    <h3 className="text-xl font-bold text-orange-800 flex items-center gap-2">
+                        <BookOpen size={24}/> KIẾN THỨC TRỌNG TÂM: {topic}
+                    </h3>
+                    <button onClick={() => setShowTheoryModal(false)} className="text-gray-400 hover:text-red-500 transition-colors">
+                        <X size={28} />
+                    </button>
+                </div>
 
-                  {/* Footer Sidebar */}
-                  <div className="p-3 border-t bg-gray-50 rounded-b-2xl text-center">
-                      <p className="text-xs text-gray-400 italic">
-                          Cửa sổ này cho phép bạn vừa xem vừa thao tác
-                      </p>
-                  </div>
-              </div>
-            )}
-            {/* --------------------------------------- */}
+                {/* Content Modal */}
+                <div className="p-6 overflow-y-auto flex-1 text-gray-800 leading-relaxed text-base">
+                    {loadingTheory ? (
+                        <div className="flex flex-col items-center justify-center h-40 space-y-4">
+                            <div className="w-10 h-10 border-4 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
+                            <p className="text-gray-500 animate-pulse">Đang tổng hợp công thức...</p>
+                        </div>
+                    ) : (
+                        // Sử dụng LatexText để hiển thị đẹp cả Markdown và Toán
+                        <div className="whitespace-pre-wrap">
+                            <LatexText text={theoryContent} />
+                        </div>
+                    )}
+                </div>
+
+                {/* Footer Modal */}
+                <div className="p-4 border-t bg-gray-50 rounded-b-2xl text-right">
+                    <button 
+                        onClick={() => setShowTheoryModal(false)}
+                        className="px-6 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold rounded-lg transition-colors"
+                    >
+                        Đóng
+                    </button>
+                </div>
+            </div>
+        </div>
+      )}      
+      {/* --------------------------------------- */}
     </div>
   );
 };
