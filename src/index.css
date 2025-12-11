@@ -1,0 +1,10 @@
+/* Import phải nằm trên cùng */
+@import "katex/dist/katex.min.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  background-color: #f8fafc;
+}

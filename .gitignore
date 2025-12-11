@@ -1,0 +1,42 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Node modules (Thư viện nặng, không đẩy lên)
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs
+*.njsproj
+*.sln
+*.sw?
+
+# Environment variables (Chứa khóa bí mật, TUYỆT ĐỐI KHÔNG ĐẨY LÊN)
+.env
+.env.*
+!.env.example
+
+# Testing
+coverage
+
+# Firebase (File tạm của Firebase)
+.firebase/
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
+
+# Vite
+vite.config.ts.timestamp-*
