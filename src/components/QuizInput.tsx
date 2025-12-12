@@ -106,7 +106,7 @@ export const QuizInput: React.FC<Props> = ({ onGenerate, isLoading }) => {
 
       {/* ... code cũ ở trên ... */}
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-primary mb-2">AI TẠO ĐỀ</h1>
+        <h1 className="text-3xl font-bold text-primary mb-2">DEEPSEEK TẠO ĐỀ</h1>
         <p className="text-gray-500 mb-2">Cô Thu mến chào, {auth.currentUser?.displayName}!</p>
         
         {/* --- [CODE ĐÃ SỬA MÀU] --- */}
